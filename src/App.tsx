@@ -7,6 +7,7 @@ import Reports from './pages/Reports'
 import Customization from './pages/Settings/Customization'
 import Employees from './pages/Employees'
 import Compliance from './pages/Compliance'
+import NotFound from './pages/NotFound'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/settings" element={<Customization />} />
           <Route path="/employees" element={<Employees />} />
           <Route path="/compliance" element={<Compliance />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
     </Router>

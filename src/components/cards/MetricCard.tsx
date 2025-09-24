@@ -24,7 +24,7 @@ export default function MetricCard({
           {positive === undefined ? '' : positive ? '▲ ' : '▼ '}{changeText}
         </span>
       </div>
-      {sublabel && <div className="text-xs text-gray-400 mt-1">{sublabel}</div>}
+      {sublabel && <div className="text-xs muted mt-1">{sublabel}</div>}
     </Card>
   )
 }

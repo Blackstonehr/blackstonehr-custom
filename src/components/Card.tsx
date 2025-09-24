@@ -117,9 +117,9 @@ export const Card: React.FC<CardProps> = ({
   }
 
   return (
-    <div className={`relative p-4 ${pulseClass} card`} style={styleVars}>
+    <div className={`relative p-6 ${pulseClass} card`} style={styleVars}>
       {title && (
-        <div className="flex justify-between items-center mb-2">
+        <div className="flex justify-between items-center mb-3">
           <h2 className="font-bold uppercase">{title}</h2>
           <div className="flex items-center gap-2">
             <button onClick={() => setShowPicker(!showPicker)} className="px-2 py-1 rounded hover:bg-white/10" aria-label="Quick color">🎨</button>

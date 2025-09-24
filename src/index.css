@@ -38,6 +38,11 @@ h1,h2,h3,h4,h5,h6 {
   font-family: var(--font-header);
 }
 
+/* Headings and text rhythm */
+h1 { font-size: 1.5rem; line-height: 2rem; }
+h2 { font-size: 1.125rem; line-height: 1.75rem; }
+.muted { color: color-mix(in oklab, var(--color-text) 60%, transparent); }
+
 /* Custom utilities mapping to CSS variables to avoid Tailwind token config */
 .text-text { color: var(--color-text); }
 .border-secondary { border-color: var(--color-secondary); }

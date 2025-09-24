@@ -23,7 +23,7 @@ export default function PageFrame({
       {(filtersLeft || filtersRight) && (
         <FiltersTabs left={filtersLeft} right={filtersRight} />
       )}
-      <div className="grid grid-cols-4 gap-4">{children}</div>
+      <div className="grid grid-cols-12 gap-6">{children}</div>
     </div>
   )
 }
