@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
 interface ButtonProps {
   label: string
@@ -7,7 +7,7 @@ interface ButtonProps {
   color?: string
   textColor?: string
   onClick?: () => void
-  id?: string // optional, in case you want per-button vars
+  id?: string
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -19,8 +19,7 @@ export const Button: React.FC<ButtonProps> = ({
   onClick,
   id = 'default'
 }) => {
-  // Set CSS vars dynamically
-  useEffect(() => {
+  React.useEffect(() => {
     const root = document.documentElement
     root.style.setProperty(`--btn-bg-${id}`, color)
     root.style.setProperty(`--btn-text-${id}`, textColor)
