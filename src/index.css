@@ -1,0 +1,51 @@
+:root {
+  --color-primary: #ff0000;
+  --color-secondary: #00ffcc;
+  --color-cardBg: #1a1a1a;
+  --color-text: #ffffff;
+  --font-body: Inter, sans-serif;
+  --font-header: Poppins, sans-serif;
+}
+
+body {
+  @apply bg-card text-text;
+  font-family: var(--font-body);
+}
+
+h1,h2,h3,h4,h5,h6 {
+  font-family: var(--font-header);
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import './components/FontFaces.css';
+
+/* Card element-level CSS variable consumption (with theme fallbacks) */
+.card {
+  background-color: var(--card-bg, var(--color-cardBg));
+  color: var(--card-text, var(--color-text));
+  font-family: var(--card-font, var(--font-body));
+  grid-column: span var(--card-columns, 1);
+  grid-row: span var(--card-rows, 1);
+  border-radius: var(--card-radius, 0);
+  box-shadow: var(--card-shadow, none);
+}
+
+/* Button element-level CSS variable consumption */
+.button {
+  background-color: var(--btn-bg, var(--color-primary));
+  color: var(--btn-text, var(--color-text));
+}
+
+.preview-body {
+  font-family: var(--font-preview-body, var(--font-body));
+}
+.preview-header {
+  font-family: var(--font-preview-header, var(--font-header));
+}
+/* Generic preview; preview instances can set --font-preview-{id}, default falls back to body */
+.preview {
+  font-family: var(--font-preview-default, var(--font-body));
+}

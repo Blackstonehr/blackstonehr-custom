@@ -1,0 +1,17 @@
+/* Local font faces for Kallisto & Prototype (place files under public/fonts/) */
+@font-face {
+  font-family: 'Kallisto';
+  src: url('/fonts/Kallisto.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Prototype';
+  src: url('/fonts/Prototype.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+
