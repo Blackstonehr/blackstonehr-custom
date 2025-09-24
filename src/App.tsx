@@ -1,10 +1,12 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Layout from './layout/Layout'
+import Layout from './app/Layout'
 import Dashboard from './pages/Dashboard'
 import Sites from './pages/Sites'
 import Safety from './pages/Safety'
 import Reports from './pages/Reports'
 import Customization from './pages/Settings/Customization'
+import Employees from './pages/Employees'
+import Compliance from './pages/Compliance'
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
           <Route path="/safety" element={<Safety />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Customization />} />
+          <Route path="/employees" element={<Employees />} />
+          <Route path="/compliance" element={<Compliance />} />
         </Routes>
       </Layout>
     </Router>
