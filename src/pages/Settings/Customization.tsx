@@ -1,5 +1,6 @@
 import React from 'react'
-import { useTheme, AVAILABLE_FONTS } from '../../context/ThemeContext'
+import { useTheme } from '../../context/ThemeContext.shared'
+import { AVAILABLE_FONTS } from '../../constants/themeDefaults'
 import FontPreview from '../../components/FontPreview'
 
 const Customization: React.FC = () => {
@@ -27,7 +28,7 @@ const Customization: React.FC = () => {
           aria-label="Body font selector"
           value={bodyFont}
           onChange={(e) => setBodyFont(e.target.value)}
-          className="p-2 bg-card text-text border border-secondary rounded mb-2 block"
+          className="p-2 bg-cardBg text-text border border-secondary rounded mb-2 block"
         >
           {AVAILABLE_FONTS.map((f) => (
             <option key={f} value={f}>{f}</option>
@@ -40,7 +41,7 @@ const Customization: React.FC = () => {
           aria-label="Header font selector"
           value={headerFont}
           onChange={(e) => setHeaderFont(e.target.value)}
-          className="p-2 bg-card text-text border border-secondary rounded mb-2 block"
+          className="p-2 bg-cardBg text-text border border-secondary rounded mb-2 block"
         >
           {AVAILABLE_FONTS.map((f) => (
             <option key={f} value={f}>{f}</option>

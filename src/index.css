@@ -1,3 +1,9 @@
+@import './components/FontFaces.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --color-primary: #ff0000;
   --color-secondary: #00ffcc;
@@ -8,7 +14,8 @@
 }
 
 body {
-  @apply bg-card text-text;
+  background-color: var(--color-cardBg);
+  color: var(--color-text);
   font-family: var(--font-body);
 }
 
@@ -16,11 +23,11 @@ h1,h2,h3,h4,h5,h6 {
   font-family: var(--font-header);
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@import './components/FontFaces.css';
+/* Custom utilities mapping to CSS variables to avoid Tailwind token config */
+.text-text { color: var(--color-text); }
+.border-secondary { border-color: var(--color-secondary); }
+.border-secondary-30 { border-color: color-mix(in oklab, var(--color-secondary) 30%, transparent); }
+.border-secondary-40 { border-color: color-mix(in oklab, var(--color-secondary) 40%, transparent); }
 
 /* Card element-level CSS variable consumption (with theme fallbacks) */
 .card {

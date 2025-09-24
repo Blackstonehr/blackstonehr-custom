@@ -1,63 +1,80 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { ChromePicker } from 'react-color'
-import { useTheme } from '../context/ThemeContext'
+import { useTheme } from '../context/ThemeContext.shared'
 import { Modal } from './Modal'
 import FontPreview from './FontPreview'
-import { AVAILABLE_FONTS } from '../context/ThemeContext'
+import { AVAILABLE_FONTS } from '../constants/themeDefaults'
+import { defaultCardSettings } from '../constants/defaultCardSettings'
+import type { CardSettings } from '../constants/defaultCardSettings'
 
 interface CardProps {
   title?: string
+  id?: string
+  columns?: number
+  rows?: number
   bgColor?: string
   textColor?: string
   borderStyle?: 'rounded' | 'sharp'
   shadow?: 'none' | 'sm' | 'md' | 'lg'
   highlight?: 'high' | 'medium' | 'low'
-  columns?: number
-  rows?: number
   font?: string
   children: React.ReactNode
 }
 
 export const Card: React.FC<CardProps> = ({
   title,
-  children,
-  bgColor = '#1a1a1a',
-  textColor = '#ffffff',
-  borderStyle = 'rounded',
-  shadow = 'md',
-  highlight = 'low',
-  columns = 1,
-  rows = 1,
-  font = 'Inter'
+  id,
+  columns,
+  rows,
+  bgColor,
+  textColor,
+  borderStyle,
+  shadow,
+  highlight,
+  font,
+  children
 }) => {
   const { bodyFont } = useTheme()
-  const [settings, setSettings] = useState({
-    bgColor,
-    textColor,
-    borderStyle,
-    shadow,
-    highlight,
-    columns,
-    rows,
-    font
+  const [settings, setSettings] = useState<CardSettings>({
+    ...defaultCardSettings,
+    ...(columns !== undefined ? { columns } : {}),
+    ...(rows !== undefined ? { rows } : {}),
+    ...(bgColor ? { bgColor } : {}),
+    ...(textColor ? { textColor } : {}),
+    ...(borderStyle ? { borderStyle } : {}),
+    ...(shadow ? { shadow } : {}),
+    ...(highlight ? { highlight } : {}),
+    ...(font ? { font } : {}),
   })
   const [showPicker, setShowPicker] = useState(false)
   const [showModal, setShowModal] = useState(false)
 
-  // Persist to localStorage per-card by title if present
-  const storageKey = useMemo(() => (title ? `card_settings_${title}` : undefined), [title])
+  // Persist to localStorage per-card by id/title with migration
+  const storageKey = useMemo(() => {
+    const keyId = id ?? title ?? 'default'
+    return `card-${keyId}`
+  }, [id, title])
   useEffect(() => {
-    if (!storageKey) return
     try {
-      const raw = localStorage.getItem(storageKey)
-      if (raw) {
-        const parsed = JSON.parse(raw)
-        setSettings((prev) => ({ ...prev, ...parsed }))
+      const saved = localStorage.getItem(storageKey)
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        setSettings(prev => ({ ...prev, ...parsed }))
+        return
+      }
+      if (title) {
+        const oldKey = `card_settings_${title}`
+        const rawOld = localStorage.getItem(oldKey)
+        if (rawOld) {
+          const parsedOld = JSON.parse(rawOld)
+          setSettings(prev => ({ ...prev, ...parsedOld }))
+          localStorage.setItem(storageKey, rawOld)
+          localStorage.removeItem(oldKey)
+        }
       }
     } catch { /* no-op */ }
-  }, [storageKey])
+  }, [storageKey, title])
   useEffect(() => {
-    if (!storageKey) return
     try {
       localStorage.setItem(storageKey, JSON.stringify(settings))
     } catch { /* no-op */ }
@@ -118,7 +135,7 @@ export const Card: React.FC<CardProps> = ({
           <ChromePicker
             color={settings.bgColor}
             onChange={c =>
-              setSettings(prev => ({ ...prev, bgColor: c.hex }))
+              setSettings((prev) => ({ ...prev, bgColor: c.hex }))
             }
           />
           <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
@@ -134,8 +151,8 @@ export const Card: React.FC<CardProps> = ({
               <span>Border</span>
               <select
                 value={settings.borderStyle}
-                onChange={(e) => setSettings((p) => ({ ...p, borderStyle: e.target.value as 'rounded' | 'sharp' }))}
-                className="bg-card border border-secondary rounded px-1 py-0.5"
+                onChange={(e) => setSettings((p) => ({ ...p, borderStyle: e.target.value as CardSettings['borderStyle'] }))}
+                className="bg-cardBg border border-secondary rounded px-1 py-0.5"
               >
                 <option value="rounded">Rounded</option>
                 <option value="sharp">Sharp</option>
@@ -145,8 +162,8 @@ export const Card: React.FC<CardProps> = ({
               <span>Shadow</span>
               <select
                 value={settings.shadow}
-                onChange={(e) => setSettings((p) => ({ ...p, shadow: e.target.value as 'none' | 'sm' | 'md' | 'lg' }))}
-                className="bg-card border border-secondary rounded px-1 py-0.5"
+                onChange={(e) => setSettings((p) => ({ ...p, shadow: e.target.value as CardSettings['shadow'] }))}
+                className="bg-cardBg border border-secondary rounded px-1 py-0.5"
               >
                 <option value="none">None</option>
                 <option value="sm">Small</option>
@@ -158,8 +175,8 @@ export const Card: React.FC<CardProps> = ({
               <span>Priority</span>
               <select
                 value={settings.highlight}
-                onChange={(e) => setSettings((p) => ({ ...p, highlight: e.target.value as 'high' | 'medium' | 'low' }))}
-                className="bg-card border border-secondary rounded px-1 py-0.5"
+                onChange={(e) => setSettings((p) => ({ ...p, highlight: e.target.value as CardSettings['highlight'] }))}
+                className="bg-cardBg border border-secondary rounded px-1 py-0.5"
               >
                 <option value="high">High</option>
                 <option value="medium">Medium</option>
@@ -174,7 +191,7 @@ export const Card: React.FC<CardProps> = ({
                 max={12}
                 value={settings.columns}
                 onChange={(e) => setSettings((p) => ({ ...p, columns: Number(e.target.value) }))}
-                className="w-16 bg-card border border-secondary rounded px-1 py-0.5"
+                className="w-16 bg-cardBg border border-secondary rounded px-1 py-0.5"
               />
             </label>
             <label className="flex items-center gap-2">
@@ -185,19 +202,25 @@ export const Card: React.FC<CardProps> = ({
                 max={12}
                 value={settings.rows}
                 onChange={(e) => setSettings((p) => ({ ...p, rows: Number(e.target.value) }))}
-                className="w-16 bg-card border border-secondary rounded px-1 py-0.5"
+                className="w-16 bg-cardBg border border-secondary rounded px-1 py-0.5"
               />
             </label>
-            <label className="flex items-center gap-2 col-span-2">
-              <span>Font</span>
-              <input
-                type="text"
-                value={settings.font}
-                onChange={(e) => setSettings((p) => ({ ...p, font: e.target.value }))}
-                placeholder={bodyFont}
-                className="flex-1 bg-card border border-secondary rounded px-1 py-0.5"
-              />
-            </label>
+            <div className="col-span-2 grid grid-cols-2 gap-2 items-center">
+              <label className="flex items-center gap-2">
+                <span>Font</span>
+                <select
+                  aria-label="Card font selector"
+                  value={settings.font}
+                  onChange={(e) => setSettings((p) => ({ ...p, font: e.target.value }))}
+                  className="bg-cardBg border border-secondary rounded px-1 py-0.5"
+                >
+                  {AVAILABLE_FONTS.map((f: string) => (
+                    <option key={f} value={f}>{f}</option>
+                  ))}
+                </select>
+              </label>
+              <FontPreview font={settings.font} id={`card-${title ?? 'untitled'}`} />
+            </div>
             <button
               className="col-span-2 mt-1 px-2 py-1 rounded bg-[var(--color-primary)]"
               onClick={() => setShowPicker(false)}
@@ -223,7 +246,7 @@ export const Card: React.FC<CardProps> = ({
           </label>
           <label className="flex items-center gap-2">
             <span>Priority</span>
-            <select value={settings.highlight} onChange={(e) => setSettings((p) => ({ ...p, highlight: e.target.value as 'high' | 'medium' | 'low' }))} className="bg-card border border-secondary rounded px-1 py-0.5">
+            <select value={settings.highlight} onChange={(e) => setSettings((p) => ({ ...p, highlight: e.target.value as CardSettings['highlight'] }))} className="bg-cardBg border border-secondary rounded px-1 py-0.5">
               <option value="high">High</option>
               <option value="medium">Medium</option>
               <option value="low">Low</option>
@@ -231,14 +254,14 @@ export const Card: React.FC<CardProps> = ({
           </label>
           <label className="flex items-center gap-2">
             <span>Border</span>
-            <select value={settings.borderStyle} onChange={(e) => setSettings((p) => ({ ...p, borderStyle: e.target.value as 'rounded' | 'sharp' }))} className="bg-card border border-secondary rounded px-1 py-0.5">
+            <select value={settings.borderStyle} onChange={(e) => setSettings((p) => ({ ...p, borderStyle: e.target.value as CardSettings['borderStyle'] }))} className="bg-cardBg border border-secondary rounded px-1 py-0.5">
               <option value="rounded">Rounded</option>
               <option value="sharp">Sharp</option>
             </select>
           </label>
           <label className="flex items-center gap-2">
             <span>Shadow</span>
-            <select value={settings.shadow} onChange={(e) => setSettings((p) => ({ ...p, shadow: e.target.value as 'none' | 'sm' | 'md' | 'lg' }))} className="bg-card border border-secondary rounded px-1 py-0.5">
+            <select value={settings.shadow} onChange={(e) => setSettings((p) => ({ ...p, shadow: e.target.value as CardSettings['shadow'] }))} className="bg-cardBg border border-secondary rounded px-1 py-0.5">
               <option value="none">None</option>
               <option value="sm">Small</option>
               <option value="md">Medium</option>
@@ -247,22 +270,17 @@ export const Card: React.FC<CardProps> = ({
           </label>
           <label className="flex items-center gap-2">
             <span>Cols</span>
-            <input type="number" min={1} max={12} value={settings.columns} onChange={(e) => setSettings((p) => ({ ...p, columns: Number(e.target.value) }))} className="w-20 bg-card border border-secondary rounded px-1 py-0.5" />
+            <input type="number" min={1} max={12} value={settings.columns} onChange={(e) => setSettings((p) => ({ ...p, columns: Number(e.target.value) }))} className="w-20 bg-cardBg border border-secondary rounded px-1 py-0.5" />
           </label>
           <label className="flex items-center gap-2">
             <span>Rows</span>
-            <input type="number" min={1} max={12} value={settings.rows} onChange={(e) => setSettings((p) => ({ ...p, rows: Number(e.target.value) }))} className="w-20 bg-card border border-secondary rounded px-1 py-0.5" />
+            <input type="number" min={1} max={12} value={settings.rows} onChange={(e) => setSettings((p) => ({ ...p, rows: Number(e.target.value) }))} className="w-20 bg-cardBg border border-secondary rounded px-1 py-0.5" />
           </label>
           <div className="col-span-2 grid grid-cols-2 gap-2 items-center">
             <label className="flex items-center gap-2">
               <span>Font</span>
-              <select
-                aria-label="Card font selector"
-                value={settings.font}
-                onChange={(e) => setSettings((p) => ({ ...p, font: e.target.value }))}
-                className="bg-card border border-secondary rounded px-1 py-0.5"
-              >
-                {AVAILABLE_FONTS.map((f) => (
+              <select value={settings.font} onChange={(e) => setSettings((p) => ({ ...p, font: e.target.value }))} className="bg-cardBg border border-secondary rounded px-1 py-0.5">
+                {AVAILABLE_FONTS.map((f: string) => (
                   <option key={f} value={f}>{f}</option>
                 ))}
               </select>
@@ -272,6 +290,15 @@ export const Card: React.FC<CardProps> = ({
         </div>
         <div className="mt-4 flex justify-end gap-2">
           <button className="px-3 py-1 rounded bg-white/10" onClick={() => setShowModal(false)}>Close</button>
+          <button
+            className="px-3 py-1 rounded bg-gray-700 text-white"
+            onClick={() => {
+              try { localStorage.removeItem(storageKey) } catch { /* no-op */ }
+              setSettings({ ...defaultCardSettings })
+            }}
+          >
+            Reset Card
+          </button>
         </div>
       </Modal>
     </div>

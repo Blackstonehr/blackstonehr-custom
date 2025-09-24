@@ -3,7 +3,7 @@ import { FontSelector } from '../components/FontSelector'
 
 export const Sidebar: React.FC = () => {
   return (
-    <aside className="fixed left-0 top-0 h-screen bg-card text-text w-[260px]">
+    <aside className="fixed left-0 top-0 h-screen bg-cardBg text-text w-[260px]">
       <div className="p-4 font-bold tracking-wider">Blackstone HR</div>
       {/* Nav items placeholder */}
     </aside>
@@ -42,7 +42,7 @@ export const Layout: React.FC<{
   children?: React.ReactNode
 }> = ({ title, headerCta, metrics, filters, children }) => {
   return (
-    <div className="min-h-screen bg-card text-text pl-[260px]">
+    <div className="min-h-screen bg-cardBg text-text pl-[260px]">
       <Sidebar />
       <div>
         <HeaderBar title={title} cta={headerCta} />

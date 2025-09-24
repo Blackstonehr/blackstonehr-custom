@@ -6,7 +6,7 @@ export default {
       colors: {
         primary: 'var(--color-primary)',
         secondary: 'var(--color-secondary)',
-        card: 'var(--color-cardBg)',
+        cardBg: 'var(--color-cardBg)',
         text: 'var(--color-text)'
       },
       fontFamily: {

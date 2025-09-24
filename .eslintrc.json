@@ -1,0 +1,7 @@
+{
+  "rules": {
+    "react/no-inline-styles": "off"
+  }
+}
+
+

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
-import { AVAILABLE_FONTS, useTheme } from '../context/ThemeContext'
+import { useTheme } from '../context/ThemeContext.shared'
+import { AVAILABLE_FONTS } from '../constants/themeDefaults'
 
 export const FontSelector: React.FC = () => {
   const { bodyFont, headerFont, setBodyFont, setHeaderFont } = useTheme()
@@ -18,9 +19,9 @@ export const FontSelector: React.FC = () => {
           <select
             value={bodyFont}
             onChange={(e) => setBodyFont(e.target.value)}
-            className="bg-card text-text border border-secondary rounded px-2 py-1"
+            className="bg-cardBg text-text border border-secondary rounded px-2 py-1"
           >
-            {AVAILABLE_FONTS.map((f) => (
+            {AVAILABLE_FONTS.map((f: string) => (
               <option key={f} value={f}>
                 {f}
               </option>
@@ -32,9 +33,9 @@ export const FontSelector: React.FC = () => {
           <select
             value={headerFont}
             onChange={(e) => setHeaderFont(e.target.value)}
-            className="bg-card text-text border border-secondary rounded px-2 py-1"
+            className="bg-cardBg text-text border border-secondary rounded px-2 py-1"
           >
-            {AVAILABLE_FONTS.map((f) => (
+            {AVAILABLE_FONTS.map((f: string) => (
               <option key={f} value={f}>
                 {f}
               </option>

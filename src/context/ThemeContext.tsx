@@ -1,39 +1,8 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
-
-type ThemeState = {
-  primaryColor: string
-  secondaryColor: string
-  cardBackgroundColor: string
-  textColor: string
-  bodyFont: string
-  headerFont: string
-  buttonTextColor: string
-}
-
-type ThemeContextValue = ThemeState & {
-  setPrimaryColor: (v: string) => void
-  setSecondaryColor: (v: string) => void
-  setCardBackgroundColor: (v: string) => void
-  setTextColor: (v: string) => void
-  setBodyFont: (v: string) => void
-  setHeaderFont: (v: string) => void
-  setButtonTextColor: (v: string) => void
-  resetTheme: () => void
-}
+import React, { useEffect, useMemo, useState } from 'react'
+import { defaultTheme } from '../constants/themeDefaults'
+import { ThemeContext, type ThemeState, type ThemeContextValue } from './ThemeContext.shared'
 
 const THEME_STORAGE_KEY = 'app_theme'
-
-export const defaultTheme: ThemeState = {
-  primaryColor: '#ff0000',
-  secondaryColor: '#00ffcc',
-  cardBackgroundColor: '#1a1a1a',
-  textColor: '#ffffff',
-  bodyFont: 'Inter, sans-serif',
-  headerFont: 'Poppins, sans-serif',
-  buttonTextColor: '#ffffff',
-}
-
-const ThemeContext = createContext<ThemeContextValue | undefined>(undefined)
 
 function applyThemeToCssVariables(theme: ThemeState) {
   const root = document.documentElement
@@ -50,7 +19,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       const raw = localStorage.getItem(THEME_STORAGE_KEY)
       if (raw) return { ...defaultTheme, ...JSON.parse(raw) }
-    } catch {}
+    } catch { /* no-op */ }
     return defaultTheme
   })
 
@@ -58,7 +27,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     applyThemeToCssVariables(theme)
     try {
       localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(theme))
-    } catch {}
+    } catch { /* no-op */ }
   }, [theme])
 
   const value = useMemo<ThemeContextValue>(() => ({
@@ -71,51 +40,20 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setHeaderFont: (v) => setTheme((t) => ({ ...t, headerFont: v })),
     setButtonTextColor: (v) => setTheme((t) => ({ ...t, buttonTextColor: v })),
     resetTheme: () => {
-      // Clear theme storage
+      try { localStorage.removeItem(THEME_STORAGE_KEY) } catch { /* no-op */ }
       try {
-        localStorage.removeItem(THEME_STORAGE_KEY)
-      } catch {}
-      // Clear per-card settings
-      try {
-        const keysToRemove: string[] = []
-        for (let i = 0; i < localStorage.length; i++) {
-          const k = localStorage.key(i)
-          if (k && (k.startsWith('card_settings_') || k.startsWith('card-'))) {
-            keysToRemove.push(k)
+        const keys = Object.keys(localStorage)
+        for (const k of keys) {
+          if (k.startsWith('card-') || k.startsWith('card_settings_')) {
+            localStorage.removeItem(k)
           }
         }
-        keysToRemove.forEach((k) => localStorage.removeItem(k))
-      } catch {}
-      // Apply default theme and persist
+      } catch { /* no-op */ }
       setTheme(defaultTheme)
     },
   }), [theme])
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }
-
-export function useTheme() {
-  const ctx = useContext(ThemeContext)
-  if (!ctx) throw new Error('useTheme must be used within ThemeProvider')
-  return ctx
-}
-
-export const AVAILABLE_FONTS: string[] = [
-  'Segoe UI, sans-serif',
-  'Inter, sans-serif',
-  'Roboto, sans-serif',
-  'Montserrat, sans-serif',
-  'Nunito, sans-serif',
-  'Poppins, sans-serif',
-  'Open Sans, sans-serif',
-  'Source Sans Pro, sans-serif',
-  'Exo 2, sans-serif',
-  'Orbitron, sans-serif',
-  'Oxanium, sans-serif',
-  'Rajdhani, sans-serif',
-  'Raleway, sans-serif',
-  'Kallisto, sans-serif',
-  'Prototype, sans-serif',
-]
 
 
